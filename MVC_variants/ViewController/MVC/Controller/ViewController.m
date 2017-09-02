@@ -11,36 +11,57 @@
 #import "ContentView.h"
 #import "Calculate.h"
 
-@interface ViewController () <InterfaceOutputProtocol, ModelOutputProtocol>
+@interface ViewController () <InterfaceInputProtocol, ModelOutputProtocol>
 
 @property (weak, nonatomic) IBOutlet ContentView *contentView;
-@property (strong, nonatomic) Calculate *model;
+@property (strong, nonatomic) Calculate *calculateModel;
 
 
 @end
 
 @implementation ViewController
 
+#pragma mark - View Controller Life Cycle Methods
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    self.model = [Calculate new];
+    // напомню, что self - это зарезервированная переменная, котороая позволяет обращаться к классу внутри себя
+    // т.е. сейчас self - это объект ViewController
     
+    // говорим contentView, что методы протокола InterfaceInputProtocol будут реализованы здесь
     self.contentView.input = self;
-    self.model.output = self;
     
+    // говорим calculateModel, что методы протокола ModelOutputProtocol будут реализованы здесь
+    self.calculateModel.output = self;
 }
 
+#pragma mark - Interface Input Protocol Methods
 
 - (void)buttonWasTapped
 {
-    [self.model calculateSomething];
+    // вызываем метод протокола ModelInputProtocol
+    [self.calculateModel calculateSomething];
 }
+
+#pragma mark - Model Output Protocol Methods
 
 - (void)sendResult:(NSString *)result
 {
+    // вызываем метод протокола InterfaceOutputProtocol
     [self.contentView updateInterfaceWithText:result];
+}
+
+#pragma mark - Lazy Initialization Methods
+
+- (Calculate*)calculateModel
+{
+    if (!_calculateModel)
+    {
+        _calculateModel = [Calculate new];
+    }
+    return _calculateModel;
 }
 
 @end
